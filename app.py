@@ -69,5 +69,9 @@ def upload_image():
 
 @app.route('/gallery', methods=['GET'])
 def gallery():
-    images = Image.query.all()
-    return render_template('gallery.html', images=images)
+    try:
+        images = Image.query.all()
+        return render_template('gallery.html', images=images)
+    except Exception as e:
+        # En producción podrías querer loggear el error en lugar de mostrarlo
+        return f"Error accessing gallery: {str(e)}", 500
