@@ -75,3 +75,9 @@ def gallery():
     except Exception as e:
         # En producción podrías querer loggear el error en lugar de mostrarlo
         return f"Error accessing gallery: {str(e)}", 500
+    
+# Prueba
+@app.route('/test', methods=['GET'])
+def test():
+    print("Test endpoint hit")
+    return "Test endpoint is working!"
