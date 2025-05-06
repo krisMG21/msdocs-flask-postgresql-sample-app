@@ -1,4 +1,4 @@
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
+from sqlalchemy import Column, DateTime, Integer, String
 from sqlalchemy.orm import validates
 from datetime import datetime, timezone
 
@@ -7,6 +7,10 @@ from app import db
 class Image(db.Model):
     __tablename__ = 'image'
     id = db.Column(db.Integer, primary_key=True)
-    uploader = db.Column(db.String(30), nullable=False)
-    image_url = db.Column(db.String(255), nullable=False)
-    upload_date = db.Column(db.DateTime, default=datetime.now(timezone.utc), nullable=False)
+    file_name = db.Column(db.String(255), nullable=False)
+    red_pixels = db.Column(db.Integer, nullable=False)
+    green_pixels = db.Column(db.Integer, nullable=False)
+    blue_pixels = db.Column(db.Integer, nullable=False)
+    original_image_url = db.Column(db.String(255), nullable=False)
+    processed_image_url = db.Column(db.String(255), nullable=False)
+    reception_date = db.Column(db.DateTime(), default=datetime.now(timezone.utc), nullable=False)

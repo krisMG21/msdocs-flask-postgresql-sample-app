@@ -37,47 +37,57 @@ def index():
 @app.route('/upload-log', methods=['GET'])
 def upload_log():
     # Query all images to simulate an upload log
-    logs = Image.query.order_by(Image.upload_date.desc()).all()
+    logs = Image.query.order_by(Image.reception_date.desc()).all()
     return render_template('upload_log.html', logs=logs)
 
 @app.route('/add', methods=['POST'])
 @csrf.exempt
 def upload_image():
     try:
-        uploader = request.form.get('uploader')
-        image = request.files.get('image')
+        file_name = request.form.get('file_name')
+        red_pixels = request.form.get('red_pixels')
+        green_pixels = request.form.get('green_pixels')
+        blue_pixels = request.form.get('blue_pixels')
+        original_file = request.files.get('original_image')
+        processed_file = request.files.get('processed_image')
 
-        if not uploader or not re.match(r'^[a-zA-Z0-9]+$', uploader):
-            return "Invalid uploader username. It must be alphanumeric.", 400
+        if not file_name or not red_pixels or not green_pixels or not blue_pixels or not original_file or not processed_file:
+            return "Missing required fields.", 400
 
-        if not image:
-            return "No image file provided.", 400
+        try:
+            red_pixels = int(red_pixels)
+            green_pixels = int(green_pixels)
+            blue_pixels = int(blue_pixels)
+        except ValueError:
+            return "Pixel values must be integers.", 400
 
-        filename = secure_filename(image.filename)
-        image_path = os.path.join(app.static_folder, 'uploads', filename)
-        os.makedirs(os.path.dirname(image_path), exist_ok=True)
-        image.save(image_path)
+        orig_filename = secure_filename(original_file.filename)
+        proc_filename = secure_filename(processed_file.filename)
+        orig_path = os.path.join(app.static_folder, 'uploads', orig_filename)
+        proc_path = os.path.join(app.static_folder, 'uploads', proc_filename)
+        os.makedirs(os.path.dirname(orig_path), exist_ok=True)
+        original_file.save(orig_path)
+        processed_file.save(proc_path)
 
-        image_url = url_for('static', filename=f'uploads/{filename}')
-        new_image = Image(uploader=uploader, image_url=image_url)
-        db.session.add(new_image)
+        original_image_url = url_for('static', filename=f'uploads/{orig_filename}')
+        processed_image_url = url_for('static', filename=f'uploads/{proc_filename}')
+
+        new_entry = Image(
+            file_name=file_name,
+            red_pixels=red_pixels,
+            green_pixels=green_pixels,
+            blue_pixels=blue_pixels,
+            original_image_url=original_image_url,
+            processed_image_url=processed_image_url
+        )
+        db.session.add(new_entry)
         db.session.commit()
 
-        return f"Image uploaded successfully by {uploader}.", 201
+        return f"Entry added successfully for {file_name}.", 201
     except Exception as e:
         return f"Error uploading image: {str(e)}", 500
 
 @app.route('/gallery', methods=['GET'])
 def gallery():
-    try:
-        images = Image.query.all()
-        return render_template('gallery.html', images=images)
-    except Exception as e:
-        # En producción podrías querer loggear el error en lugar de mostrarlo
-        return f"Error accessing gallery: {str(e)}", 500
-    
-# Prueba
-@app.route('/test', methods=['GET'])
-def test():
-    print("Test endpoint hit")
-    return "Test endpoint is working!"
+    images = Image.query.all()
+    return render_template('gallery.html', images=images)
