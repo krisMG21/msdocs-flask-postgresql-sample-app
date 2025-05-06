@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Upload Log{% endblock %}
+{% block content %}
+<h1>Upload Log</h1>
+<table class="table">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Uploader</th>
+            <th>Image URL</th>
+            <th>Upload Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for log in logs %}
+        <tr>
+            <td>{{ log.id }}</td>
+            <td>{{ log.uploader }}</td>
+            <td><a href="{{ log.image_url }}" target="_blank">{{ log.image_url }}</a></td>
+            <td>{{ log.upload_date }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
