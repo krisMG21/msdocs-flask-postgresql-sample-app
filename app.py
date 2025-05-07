@@ -87,7 +87,7 @@ def upload_image():
     except Exception as e:
         return f"Error uploading image: {str(e)}", 500
 
-@app.route('/gallery', methods=['GET'])
-def gallery():
-    images = Image.query.all()
-    return render_template('gallery.html', images=images)
+# @app.route('/gallery', methods=['GET'])
+# def gallery():
+#     images = Image.query.all()
+#     return render_template('gallery.html', images=images)
